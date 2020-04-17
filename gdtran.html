@@ -1,0 +1,202 @@
+<html lang="zh">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport"
+    content="width=device-width,initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>京东转链</title>
+  <link rel="stylesheet" type="text/css" href="style.css" />
+
+  <script src="http://apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script>
+
+  <script type="text/javascript">
+    $(function () {
+      var screenwidth, screenheight, mytop, getPosLeft, getPosTop
+      // screenwidth = $(window).width();
+      // screenheight = $(window).height();
+      // //获取滚动条距顶部的偏移
+      // mytop = $(document).scrollTop();
+      // //计算弹出层的left
+      // getPosLeft = screenwidth / 2 - 260;
+      // //计算弹出层的top
+      // getPosTop = screenheight / 2 - 150;
+      //css定位弹出层
+      //$("#box").css({ "left": "15%", "top": "20%" });
+      //当浏览器窗口大小改变时...
+      // $(window).resize(function () {
+      //   screenwidth = $(window).width();
+      //   screenheight = $(window).height();
+      //   mytop = $(document).scrollTop();
+      //   getPosLeft = screenwidth / 2 - 260;
+      //   getPosTop = screenheight / 2 - 150;
+      //   $("#box").css({ "left": getPosLeft, "top": getPosTop + mytop });
+      // });
+
+      //当拉动滚动条时...
+      // $(window).scroll(function () {
+      //   screenwidth = $(window).width();
+      //   screenheight = $(window).height();
+      //   mytop = $(document).scrollTop();
+      //   getPosLeft = screenwidth / 2 - 260;
+      //   getPosTop = screenheight / 2 - 150;
+      //   $("#box").css({ "left": getPosLeft, "top": getPosTop + mytop });
+      // });
+
+      //弹出窗口函数全局
+        showDia = function (arr) {
+        $("#box").fadeIn("fast");
+        //获取页面文档的高度
+        var docheight = $(document).height();
+        //追加一个层，使背景变灰
+        $("body").append("<div id='greybackground'></div>");
+        $("#greybackground").css({ "opacity": "0.5", "height": docheight });
+
+        var obj = eval("(" + arr + ")");
+        var goodsName = obj.goodsName;
+        var unitPrice = obj.unitPrice;
+        var commisionRatioWl = obj.commisionRatioWl;
+        var imgUrl = obj.imgUrl;
+        var clickURL = obj.clickURL;
+        $("#box2tittle").text(goodsName);
+        $(".box2img").attr("src",imgUrl);
+        $("#youhuijia").text(unitPrice*(100-commisionRatioWl)/100);
+        $("#yuanjia").text(unitPrice);
+        $("#youhuiquan").text(" "+unitPrice*commisionRatioWl/100+"元");
+        $("#box3btn2").val("赚"+unitPrice*commisionRatioWl/100+"元");
+
+        $("#box3btn1").click(function () {
+
+          open(clickURL);
+          
+        })
+
+        //alert(clickURL);
+        return false;
+      }
+
+      //点击链接弹出窗口
+      $("#popup").click(showDia);
+
+      //点击关闭按钮
+      $("#closeBtn").click(function () {
+        $("#box").hide();
+        //删除变灰的层
+        $("#greybackground").remove();
+        return false;
+      });
+
+    });
+
+  </script>
+
+  <script type="text/javascript">
+    function go() {
+      var reg = new RegExp("\\d+(?=.html)");
+	    var goodsID = $('#form1').serialize().match(reg);
+     // alert(goodsID);
+      $.ajax({
+        
+        //几个参数需要注意一下
+        type: "GET",//方法类型
+        //dataType: "json",//预期服务器返回的数据类型
+        url: "action.php",//url
+        data: "u="+goodsID,
+        //data: "u=5171254",
+        success: function (result) {
+         // console.log(result);//打印服务端返回的数据(调试用)
+          var inf = JSON.parse(result);
+         // alert(inf);
+          showDia(result);
+
+        },
+        error: function () {
+          alert("异常！");
+        }
+      });
+
+    }
+    function goavailable() {
+      if (form1.u.value != "") {
+        $("#btn").css("backgroundColor", "#B82324");
+      }
+      else {
+        $("#btn").css("backgroundColor", "#CCCCCC");
+      }
+
+    }
+
+    //form提交前，验证
+    function check(form) {
+      var uText = form1.u.value;
+      if (form.u.value == "") {
+        alert("内容不能为空！");
+        form.u.focus();
+        return false;
+      }
+
+      var reg = new RegExp("\\d+(?=.html)");
+      var goodsID = uText.match(reg);
+      form.u.value = goodsID;
+      //alert(goodsID);
+      return true;
+    }
+  </script>
+</head>
+
+<body>
+
+  <div id="lg">
+    <img src="jjjr@2x.png" width="50%" />
+  </div>
+
+
+  <h1>
+    <form id="form1" onsubmit="return false" action="##" method="get">
+      <div id="inputline">
+        <img src="locker@2x.png" width=20px height=20px style="left: 0;" />
+        <input type="text" id="u" name="u" height="20" autofocus="autofocus" placeholder="请输入京东商品链接" oninput="goavailable()">
+      </div>
+      <br>
+      <br>
+      <button id="btn" type="submit" onclick="go()">提交</button>
+    </form>
+  </h1>
+
+
+
+  <!-- <div id="wrapper">
+    　　<a href="#" id="popup">点击弹出div窗口</a>
+  </div> -->
+  <div id="box">
+    <!-- 　 <span id="closeBtn">关闭</span> -->
+    <div id="box1">
+      检测到可转换的商品
+    </div>
+    <div id="box2">
+      <img class="box2img" src="shangpin.jpg" />
+      <div id=box2content>
+        <div id="box2tittle">
+          xxxxxxx/0.5555/YYYYYYYYYYYY/88888/xxxxxxxxxxx奶油
+        </div>
+        <p class="ticket">
+          <span class="quan">惠</span><span id="youhuiquan">&nbsp;xx元</span></p>
+
+        <div id="box2qian">
+          到手 &nbsp;￥<span id="youhuijia" style="font-size: 1.5em;">6.66</span>&nbsp;&nbsp;<span style="color: #666666;">￥<span
+              id="yuanjia" style="font-size: 1.5em;text-decoration: line-through;">9.99</span></span>
+        </div>
+      </div>
+    </div>
+    <div id="box3">
+      <input type="button" id="box3btn1" value="查看商品" />
+      <input type="button" id="box3btn2" value="赚￥xxx" />
+    </div>
+  </div>
+
+  <div id="foot">
+    <p>输入京东商品链接，手机京东点击分享-复制链接</p>
+  </div>
+
+</body>
+
+</html>
